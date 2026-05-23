@@ -2,7 +2,7 @@ pipeline {
     agent any
 
     environment {
-        DOCKER_HUB_USER  = 'sourabhbhpj94'
+        DOCKER_HUB_USER  = 'sourabhpj94'
         IMAGE_NAME       = 'my-nginx-image'
         TAG              = 'latest'
         EKS_CLUSTER_NAME = 'my-eks-cluster'
