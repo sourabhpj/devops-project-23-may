@@ -1,12 +1,12 @@
+# १. Deployment: ॲप्लिकेशनचे पॉड्स (Pods) तयार करण्यासाठी
 apiVersion: apps/v1
 kind: Deployment
 metadata:
-  name: nginx-deployment
+  name: my-nginx-deployment
   labels:
     app: nginx
-namespace: default
 spec:
-  replicas: 2
+  replicas: 2              # किती पॉड्स चालू असावेत
   selector:
     matchLabels:
       app: nginx
@@ -17,22 +17,21 @@ spec:
     spec:
       containers:
       - name: nginx-container
-        image: sourabhbhpj94/my-nginx-image:latest
-        imagePullPolicy: Always
+        image: sourabhbhpj94/my-nginx-image:latest # तुमची इमेज
         ports:
         - containerPort: 80
 
 ---
+# २. Service: बाहेरून ॲक्सेस देण्यासाठी (LoadBalancer)
 apiVersion: v1
 kind: Service
 metadata:
   name: nginx-service
-namespace: default
 spec:
-  type: LoadBalancer
+  type: LoadBalancer       # EKS वर आपोआप AWS LoadBalancer तयार होईल
   selector:
     app: nginx
   ports:
-  - protocol: TCP
-    port: 80
-    targetPort: 80
+    - protocol: TCP
+      port: 80             # सर्व्हिसचा पोर्ट
+      targetPort: 80       # पॉडचा पोर्ट
