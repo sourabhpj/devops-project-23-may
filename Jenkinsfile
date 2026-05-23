@@ -35,8 +35,13 @@ pipeline {
 
         stage('Deploy to EKS Cluster') {
             steps {
-                // kubeconfig आधीच अपडेट झाला असल्यामुळे थेट डिप्लॉयमेंट कमांड चालेल
-                sh 'kubectl apply -f deployment.yaml'
+               // 'withCredentials' वापरून आपण जेनकिन्सला सुरक्षितपणे क्रेडेंशियल्स देतो
+        withCredentials([
+            string(credentialsId: 'aws-access-key', variable: 'AWS_ACCESS_KEY_ID'),
+            string(credentialsId: 'aws-secret-key', variable: 'AWS_SECRET_ACCESS_KEY')
+        ]) {
+            sh 'aws eks update-kubeconfig --region ap-south-1 --name my-eks-cluster'
+            sh 'kubectl apply -f deployment.yaml'
             }
         }
     }
