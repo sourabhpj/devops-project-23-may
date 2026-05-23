@@ -18,31 +18,25 @@ pipeline {
 
         stage('Build') {
             steps {
-                sh "docker build -t ${DOCKER_HUB_USER}/${IMAGE_NAME}:${TAG} ."
+                // सिंगल कोट्समुळे व्हेरिएबल्स अगदी परफेक्ट रीड होतील
+                sh 'docker build -t ${DOCKER_HUB_USER}/${IMAGE_NAME}:${TAG} .'
             }
         }
 
         stage('Push to Docker Hub') {
             steps {
+                // क्रेडेंशियल आयडी आपण नवीन बनवलेला 'docker-hub-new-token' वापरला आहे
                 withCredentials([usernamePassword(credentialsId: 'docker-hub-new-token', passwordVariable: 'DOCKER_PASSWORD', usernameVariable: 'DOCKER_USERNAME')]) {
-                    sh "echo ${DOCKER_PASSWORD} | docker login -u ${DOCKER_USERNAME} --password-stdin"
-                    sh "docker push ${DOCKER_HUB_USER}/${IMAGE_NAME}:${TAG}"
+                    sh 'echo ${DOCKER_PASSWORD} | docker login -u ${DOCKER_USERNAME} --password-stdin'
+                    sh 'docker push ${DOCKER_HUB_USER}/${IMAGE_NAME}:${TAG}'
                 }
             }
         }
 
         stage('Deploy to EKS Cluster') {
             steps {
-                script {
-                    // Jenkins ला क्लस्टरचा लेटेस्ट ॲक्सेस मिळवून देणे
-                    sh "aws eks update-kubeconfig --region ${AWS_REGION} --name ${EKS_CLUSTER_NAME}"
-                    
-                    // Kubernetes वर पॉड्स आणि लोड बॅलन्सर अप्लाय करणे
-                    sh "kubectl apply -f deployment.yaml"
-                    
-                    // Zero Downtime साठी रोलआउट रीस्टार्ट करणे
-                    sh "kubectl rollout restart deployment/nginx-deployment"
-                }
+                // kubeconfig आधीच अपडेट झाला असल्यामुळे थेट डिप्लॉयमेंट कमांड चालेल
+                sh 'kubectl apply -f deployment.yaml'
             }
         }
     }
