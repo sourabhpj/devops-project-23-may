@@ -15,14 +15,14 @@ pipeline {
         }
         stage('build') {
             steps {
-                sh 'docker build -t sourabhpj94/my-nginx-image:Latest .'
+                sh 'docker build -t sourabhpj94/my-nginx-image:latest .'
             }
         }
         stage('push to Docker Hub') {
             steps {
                 withCredentials([usernamePassword(credentialsId: 'docker-hub-credentials', passwordVariable: 'DOCKER_PASSWORD', usernameVariable: 'DOCKER_USERNAME')])
                 sh 'echo $DOCKER_PASSWORD | docker login -u $DOCKER_USERNAME --password-stdin'
-                sh 'docker push sourabhpj94/my-nginx-image:Latest'
+                sh 'docker push sourabhpj94/my-nginx-image:latest'
                 }
             }
         }
